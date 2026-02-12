@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USCIS Civics Test</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            crimson: {
+              DEFAULT: '#DC143C', 
+              hover: '#B91032',
+              light: '#ffeef0'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Smooth transitions */
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hidden-screen {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 font-sans flex items-center justify-center p-4 selection:bg-crimson selection:text-white">
+
+  <!-- === START SCREEN === -->
+  <div id="start-screen" class="max-w-md w-full bg-white p-8 rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 text-center fade-in">
+    <div class="w-20 h-20 bg-crimson rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-crimson/30 text-white">
+      <i data-lucide="award" class="w-10 h-10"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-3 tracking-tight text-slate-900">USCIS Civics Test</h1>
+    <p class="text-slate-500 mb-8 text-sm leading-relaxed">
+      Prepare for your US Citizenship interview. You will be asked 96 universal questions in a random order (state-specific questions are excluded). You need 60% to pass.
+    </p>
+    <button onclick="startGame()" class="w-full bg-crimson hover:bg-crimson-hover text-white font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-crimson/20">
+      <i data-lucide="play" class="w-5 h-5"></i>
+      Start Test
+    </button>
+  </div>
+
+  <!-- === GAME SCREEN === -->
+  <div id="game-screen" class="max-w-4xl w-full hidden-screen flex flex-col items-center">
+    
+    <!-- Progress Bar -->
+    <div class="w-full max-w-2xl mb-8 flex items-center gap-4 fade-in">
+      <div class="text-sm font-semibold text-slate-400 w-20 text-right" id="progress-text">
+        1 / 96
+      </div>
+      <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
+        <div id="progress-bar" class="bg-crimson h-2 rounded-full transition-all duration-300 w-[1%] shadow-[0_0_10px_rgba(220,20,60,0.5)]"></div>
+      </div>
+      <div class="text-sm font-semibold text-slate-400 w-20">
+        Score: <span id="score-text" class="text-slate-700">0</span>
+      </div>
+    </div>
+
+    <div class="w-full bg-white border border-slate-100 p-6 md:p-10 rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] relative overflow-hidden fade-in">
+      <!-- Decorative Badge -->
+      <div class="absolute top-0 right-0 bg-crimson-light px-4 py-2 rounded-bl-2xl text-xs font-bold text-crimson uppercase tracking-widest" id="question-badge">
+        Q#1
+      </div>
+
+      <h2 id="question-text" class="text-2xl md:text-3xl font-bold mb-8 mt-4 text-slate-900 leading-tight">
+        Loading question...
+      </h2>
+
+      <form id="answer-form" class="space-y-4">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Type your answer..."
+          autocomplete="off"
+          class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-5 py-4 text-lg text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-crimson focus:bg-white focus:ring-4 focus:ring-crimson/10"
+        />
+        
+        <!-- Check Button -->
+        <button 
+          type="submit"
+          id="check-btn"
+          class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Check Answer
+        </button>
+
+        <!-- Feedback Area (Hidden by default) -->
+        <div id="feedback-area" class="space-y-6 hidden-screen mt-4 fade-in">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Left: Current Question Feedback -->
+            <div id="feedback-box" class="p-5 rounded-xl border flex flex-col justify-center">
+              <div class="flex items-center gap-2 mb-2" id="feedback-title-container">
+                <!-- Icon and Title inserted via JS -->
+              </div>
+              <div class="text-sm text-slate-600 mt-3">
+                <span class="text-xs uppercase tracking-wider font-bold text-slate-400 block mb-1">Accepted answers:</span>
+                <span id="correct-answers-text" class="font-medium text-slate-800"></span>
+              </div>
+            </div>
+
+            <!-- Right: Historical Context / Fact -->
+            <div class="p-5 rounded-xl border bg-blue-50/50 border-blue-100 flex flex-col justify-center">
+              <h3 class="font-bold text-blue-800 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-blue-600"></i> Did you know?
+              </h3>
+              <p id="fact-text" class="text-sm text-slate-700 leading-relaxed italic"></p>
+            </div>
+          </div>
+          
+          <button 
+            type="button"
+            onclick="nextQuestion()"
+            id="next-btn"
+            class="w-full bg-crimson hover:bg-crimson-hover text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-crimson/20"
+          >
+            <span>Next Question</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- === END SCREEN === -->
+  <div id="end-screen" class="max-w-md w-full bg-white p-8 rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 text-center hidden-screen fade-in">
+    <div id="end-icon-container" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg text-white">
+      <!-- Icon inserted via JS -->
+    </div>
+    <h2 id="end-title" class="text-3xl font-bold mb-2 text-slate-900">Results</h2>
+    <p class="text-slate-500 mb-6 text-lg">
+      Your score: <span id="final-score" class="font-bold text-slate-900">0</span>
+    </p>
+    
+    <div class="w-full bg-slate-100 rounded-full h-3 mb-8 overflow-hidden">
+      <div id="final-progress" class="h-3 rounded-full transition-all duration-1000 w-0"></div>
+    </div>
+
+    <button 
+      onclick="startGame()"
+      class="w-full bg-white border-2 border-slate-200 hover:border-crimson hover:text-crimson text-slate-700 font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+    >
+      <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+      Retake Test
+    </button>
+  </div>
+
+  <!-- === APPLICATION LOGIC === -->
+  <script>
+    // === QUESTIONS DATABASE WITH INFO CONTEXT ===
+    const CIVICS_QUESTIONS = [
+      { id: 1, q: "What is the supreme law of the land?", a: ["the Constitution"], info: "The U.S. Constitution is the oldest and shortest written Constitution of any major government in the world, signed in 1787." },
+      { id: 2, q: "What does the Constitution do?", a: ["sets up the government", "defines the government", "protects basic rights of Americans"], info: "It establishes the three branches of the federal government: legislative, executive, and judicial, ensuring no single entity has too much power." },
+      { id: 3, q: "The idea of self-government is in the first three words of the Constitution. What are these words?", a: ["We the People"], info: "These words establish 'popular sovereignty', meaning the government's power comes directly from the citizens it governs." },
+      { id: 4, q: "What is an amendment?", a: ["a change", "an addition", "a change to the Constitution", "an addition to the Constitution"], info: "Article V of the Constitution outlines how to amend it. It requires a two-thirds majority in Congress and ratification by three-fourths of the states." },
+      { id: 5, q: "What do we call the first ten amendments to the Constitution?", a: ["the Bill of Rights"], info: "James Madison wrote the amendments, which list specific prohibitions on governmental power to protect individual liberties." },
+      { id: 6, q: "What is one right or freedom from the First Amendment?", a: ["speech", "religion", "assembly", "press", "petition the government"], info: "The First Amendment guarantees the core liberties of a free democratic society, ensuring citizens can speak their minds and gather peacefully." },
+      { id: 7, q: "How many amendments does the Constitution have?", a: ["27", "twenty-seven"], info: "The 27th Amendment, which deals with congressional pay, was actually proposed in 1789 but wasn't fully ratified until 1992!" },
+      { id: 8, q: "What did the Declaration of Independence do?", a: ["announced our independence", "declared our independence", "said that the United States is free"], info: "It formally severed the political ties between the 13 American colonies and Great Britain." },
+      { id: 9, q: "What are two rights in the Declaration of Independence?", a: ["life, liberty", "life, pursuit of happiness", "liberty, pursuit of happiness", "life, liberty, pursuit of happiness", "life", "liberty", "pursuit of happiness"], info: "Thomas Jefferson adapted these concepts from English philosopher John Locke, who wrote about 'life, liberty, and property'." },
+      { id: 10, q: "What is freedom of religion?", a: ["You can practice any religion, or not practice a religion"], info: "This is protected by the First Amendment's Establishment Clause and Free Exercise Clause, which separate church and state." },
+      { id: 11, q: "What is the economic system in the United States?", a: ["capitalist economy", "market economy", "capitalism"], info: "A capitalist economy means private citizens and businesses own the means of production and compete for profit with minimal government interference." },
+      { id: 12, q: "What is the \"rule of law\"?", a: ["Everyone must follow the law", "Leaders must obey the law", "Government must obey the law", "No one is above the law"], info: "The concept originated from the Magna Carta in 1215, ensuring that even kings or presidents are subject to legal consequences." },
+      { id: 13, q: "Name one branch or part of the government.", a: ["Congress", "legislative", "President", "executive", "the courts", "judicial"], info: "This tripartite system was designed by the founding fathers based on the ideas of the French philosopher Montesquieu." },
+      { id: 14, q: "What stops one branch of government from becoming too powerful?", a: ["checks and balances", "separation of powers"], info: "For example, Congress can pass a law, but the President can veto it. The Supreme Court can then declare it unconstitutional." },
+      { id: 15, q: "Who is in charge of the executive branch?", a: ["the President"], info: "The President serves as both the head of state and head of government of the United States." },
+      { id: 16, q: "Who makes federal laws?", a: ["Congress", "Senate and House", "legislature"], info: "Article I of the Constitution grants all legislative powers to the Congress, which consists of two chambers." },
+      { id: 17, q: "What are the two parts of the U.S. Congress?", a: ["the Senate and House", "Senate and House of Representatives"], info: "This bicameral system was created by the 'Great Compromise' of 1787 to balance the power of large and small states." },
+      { id: 18, q: "How many U.S. Senators are there?", a: ["100", "one hundred"], info: "Each of the 50 states is given exactly 2 senators, ensuring equal representation for every state regardless of size." },
+      { id: 19, q: "We elect a U.S. Senator for how many years?", a: ["6", "six"], info: "Senate terms are staggered so that about one-third of the Senate is up for reelection every two years." },
+      { id: 21, q: "The House of Representatives has how many voting members?", a: ["435", "four hundred thirty-five"], info: "The number 435 was permanently set by the Reapportionment Act of 1929." },
+      { id: 22, q: "We elect a U.S. Representative for how many years?", a: ["2", "two"], info: "Two-year terms are meant to keep Representatives highly responsive to the immediate needs of their local constituents." },
+      { id: 24, q: "Who does a U.S. Senator represent?", a: ["all people of the state", "all people"], info: "Before the 17th Amendment in 1913, Senators were chosen by state legislatures, not directly by the people." },
+      { id: 25, q: "Why do some states have more Representatives than other states?", a: ["state's population", "they have more people", "some states have more people"], info: "Seats are reallocated every 10 years based on the national census data." },
+      { id: 26, q: "We elect a President for how many years?", a: ["4", "four"], info: "The 22nd Amendment limits the President to serving only two elected 4-year terms." },
+      { id: 27, q: "In what month do we vote for President?", a: ["November"], info: "Election Day is specifically the Tuesday following the first Monday in November. This was set in 1845 to accommodate farmers after the fall harvest." },
+      { id: 28, q: "What is the name of the President of the United States now?", a: ["Joe Biden", "Biden"], info: "Joe Biden is the 46th President. The answer to this changes based on recent elections." },
+      { id: 29, q: "What is the name of the Vice President of the United States now?", a: ["Kamala Harris", "Harris"], info: "Kamala Harris is the 49th Vice President. She is the first female vice president in U.S. history." },
+      { id: 30, q: "If the President can no longer serve, who becomes President?", a: ["the Vice President"], info: "This succession has happened 9 times in US History, most recently when Lyndon B. Johnson succeeded JFK." },
+      { id: 31, q: "If both the President and the Vice President can no longer serve, who becomes President?", a: ["the Speaker of the House", "Speaker of the House"], info: "This line of succession was established by the Presidential Succession Act of 1947." },
+      { id: 32, q: "Who is the Commander in Chief of the military?", a: ["the President"], info: "While the President commands the military, only Congress has the power to formally declare war." },
+      { id: 33, q: "Who signs bills to become laws?", a: ["the President"], info: "Once a bill passes both the House and Senate, it is presented to the President to sign into law or veto." },
+      { id: 34, q: "Who vetoes bills?", a: ["the President"], info: "A President's veto can be overridden by a two-thirds majority vote in both the House and the Senate." },
+      { id: 35, q: "What does the President's Cabinet do?", a: ["advises the President"], info: "The tradition of the Cabinet dates back to George Washington, who had just four Cabinet members." },
+      { id: 36, q: "What are two Cabinet-level positions?", a: ["Secretary of Agriculture", "Secretary of Commerce", "Secretary of Defense", "Secretary of Education", "Secretary of Energy", "Secretary of Health and Human Services", "Secretary of Homeland Security", "Secretary of Housing and Urban Development", "Secretary of the Interior", "Secretary of Labor", "Secretary of State", "Secretary of Transportation", "Secretary of the Treasury", "Secretary of Veterans Affairs", "Attorney General", "Vice President"], info: "The newest Cabinet position is the Secretary of Homeland Security, created in 2002 after the 9/11 attacks." },
+      { id: 37, q: "What does the judicial branch do?", a: ["reviews laws", "explains laws", "resolves disputes", "decides if a law goes against the Constitution"], info: "The judicial branch's power of 'judicial review' was firmly established by the landmark 1803 case Marbury v. Madison." },
+      { id: 38, q: "What is the highest court in the United States?", a: ["the Supreme Court"], info: "The Supreme Court is the final arbiter of the law and its decisions cannot be appealed to any other court." },
+      { id: 39, q: "How many justices are on the Supreme Court?", a: ["9", "nine"], info: "The Constitution does not specify the number of Justices; the number 9 was set by Congress in 1869." },
+      { id: 40, q: "Who is the Chief Justice of the United States now?", a: ["John Roberts", "Roberts"], info: "John Roberts was nominated by President George W. Bush and assumed office in 2005." },
+      { id: 41, q: "Under our Constitution, some powers belong to the federal government. What is one power of the federal government?", a: ["to print money", "to declare war", "to create an army", "to make treaties"], info: "These are called 'enumerated powers', specifically listed in Article I, Section 8 of the Constitution." },
+      { id: 42, q: "Under our Constitution, some powers belong to the states. What is one power of the states?", a: ["provide schooling and education", "provide protection", "police", "provide safety", "fire departments", "give a driver's license", "approve zoning and land use"], info: "The 10th Amendment dictates that any powers not given to the federal government are reserved for the states and the people." },
+      { id: 45, q: "What are the two major political parties in the United States?", a: ["Democratic and Republican", "Democrats and Republicans"], info: "While there are third parties, the US uses a 'winner-take-all' system that naturally favors a two-party dominance." },
+      { id: 46, q: "What is the political party of the President now?", a: ["Democratic", "Democrat"], info: "The Democratic Party's symbol is traditionally the donkey, while the Republican Party's symbol is the elephant." },
+      { id: 47, q: "What is the name of the Speaker of the House of Representatives now?", a: ["Mike Johnson", "Johnson"], info: "The Speaker presides over the House and is second in the presidential line of succession, right after the Vice President." },
+      { id: 48, q: "There are four amendments to the Constitution about who can vote. Describe one of them.", a: ["Citizens eighteen and older", "18 and older", "You don't have to pay a poll tax", "Any citizen can vote", "Women and men can vote", "A male citizen of any race can vote"], info: "The 15th, 19th, 24th, and 26th amendments all expanded voting rights to different groups of Americans over time." },
+      { id: 49, q: "What is one responsibility that is only for United States citizens?", a: ["serve on a jury", "vote in a federal election"], info: "Jury duty is considered a fundamental civic duty to ensure citizens receive a fair trial by their peers." },
+      { id: 50, q: "Name one right only for United States citizens.", a: ["vote in a federal election", "run for federal office"], info: "While permanent residents have many rights, voting in federal elections is strictly reserved for naturalized and birthright citizens." },
+      { id: 51, q: "What are two rights of everyone living in the United States?", a: ["freedom of expression", "freedom of speech", "freedom of assembly", "freedom to petition the government", "freedom of religion", "the right to bear arms"], info: "The Bill of Rights largely applies to anyone on US soil, regardless of their citizenship or immigration status." },
+      { id: 52, q: "What do we show loyalty to when we say the Pledge of Allegiance?", a: ["the United States", "the flag"], info: "The pledge was written in 1892 by a socialist minister named Francis Bellamy. The phrase 'under God' was added in 1954." },
+      { id: 53, q: "What is one promise you make when you become a United States citizen?", a: ["give up loyalty to other countries", "defend the Constitution and laws", "obey the laws of the United States", "serve in the U.S. military", "serve the nation", "be loyal to the United States"], info: "This promise is made during the final step of naturalization: The Oath of Allegiance ceremony." },
+      { id: 54, q: "How old do citizens have to be to vote for President?", a: ["18", "eighteen"], info: "The voting age was lowered from 21 to 18 during the Vietnam War with the 26th Amendment in 1971." },
+      { id: 55, q: "What are two ways that Americans can participate in their democracy?", a: ["vote", "join a political party", "help with a campaign", "join a civic group", "join a community group", "give an elected official your opinion", "call Senators and Representatives", "publicly support or oppose an issue", "run for office", "write to a newspaper"], info: "The US relies heavily on civic engagement beyond just voting, including public discourse and community organization." },
+      { id: 56, q: "When is the last day you can send in federal income tax forms?", a: ["April 15", "April 15th"], info: "Also known as 'Tax Day'. If April 15 falls on a weekend or a holiday, the deadline is extended to the next business day." },
+      { id: 57, q: "When must all men register for the Selective Service?", a: ["at age 18", "between 18 and 26", "eighteen"], info: "This system maintains information on those potentially subject to military conscription (the draft), which hasn't been used since 1973." },
+      { id: 58, q: "What is one reason colonists came to America?", a: ["freedom", "political liberty", "religious freedom", "economic opportunity", "practice their religion", "escape persecution"], info: "Groups like the Pilgrims and Puritans sought religious freedom, while others came hoping to find wealth and farmland." },
+      { id: 59, q: "Who lived in America before the Europeans arrived?", a: ["American Indians", "Native Americans"], info: "Native Americans had been living on the continent for thousands of years, with hundreds of diverse cultures and languages." },
+      { id: 60, q: "What group of people was taken to America and sold as slaves?", a: ["Africans", "people from Africa"], info: "The first enslaved Africans were brought to the English colony of Jamestown, Virginia, in 1619." },
+      { id: 61, q: "Why did the colonists fight the British?", a: ["high taxes", "taxation without representation", "British army stayed in their houses", "quartering", "didn't have self-government"], info: "The Stamp Act and the Tea Act were deeply unpopular because colonists had no elected representatives in the British Parliament." },
+      { id: 62, q: "Who wrote the Declaration of Independence?", a: ["Thomas Jefferson", "Jefferson"], info: "Thomas Jefferson was the principal author, but a committee including John Adams and Benjamin Franklin helped revise it." },
+      { id: 63, q: "When was the Declaration of Independence adopted?", a: ["July 4, 1776", "July 4 1776"], info: "While it was adopted on July 4, most delegates didn't actually sign the physical document until August 2, 1776." },
+      { id: 64, q: "There were 13 original states. Name three.", a: ["New Hampshire", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania", "Delaware", "Maryland", "Virginia", "North Carolina", "South Carolina", "Georgia"], info: "These states originated as the 13 British colonies that declared independence during the American Revolution." },
+      { id: 65, q: "What happened at the Constitutional Convention?", a: ["The Constitution was written", "The Founding Fathers wrote the Constitution"], info: "The convention was held in Philadelphia in 1787. Initially, they only planned to fix the existing 'Articles of Confederation'." },
+      { id: 66, q: "When was the Constitution written?", a: ["1787"], info: "It took several months of fierce debate behind closed doors in Independence Hall before it was finally signed." },
+      { id: 67, q: "The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.", a: ["James Madison", "Madison", "Alexander Hamilton", "Hamilton", "John Jay", "Jay", "Publius"], info: "They wrote 85 essays under the pen name 'Publius' to persuade New York voters to ratify the new Constitution." },
+      { id: 68, q: "What is one thing Benjamin Franklin is famous for?", a: ["U.S. diplomat", "diplomat", "oldest member of the Constitutional Convention", "first Postmaster General of the United States", "writer of Poor Richard's Almanac", "started the first free libraries"], info: "Franklin was also an inventor who discovered principles of electricity and invented bifocal glasses." },
+      { id: 69, q: "Who is the \"Father of Our Country\"?", a: ["George Washington", "Washington"], info: "He led the Continental Army to victory in the Revolutionary War and served as the nation's first president." },
+      { id: 70, q: "Who was the first President?", a: ["George Washington", "Washington"], info: "He is the only president in American history to be elected unanimously by the Electoral College." },
+      { id: 71, q: "What territory did the United States buy from France in 1803?", a: ["the Louisiana Territory", "Louisiana"], info: "The Louisiana Purchase essentially doubled the size of the United States for only $15 million (about 3 cents an acre)." },
+      { id: 72, q: "Name one war fought by the United States in the 1800s.", a: ["War of 1812", "Mexican-American War", "Civil War", "Spanish-American War"], info: "The Civil War (1861–1865) was the deadliest conflict in American history, primarily fought over the institution of slavery." },
+      { id: 73, q: "Name the U.S. war between the North and the South.", a: ["the Civil War", "the War between the States"], info: "The Northern states were known as the Union, and the Southern states were known as the Confederacy." },
+      { id: 74, q: "Name one problem that led to the Civil War.", a: ["slavery", "economic reasons", "states' rights"], info: "Slavery was the central and fundamental cause of the war, as Southern economies relied heavily on enslaved labor." },
+      { id: 75, q: "What was one important thing that Abraham Lincoln did?", a: ["freed the slaves", "Emancipation Proclamation", "saved the Union", "preserved the Union", "led the United States during the Civil War"], info: "Lincoln's leadership preserved the United States as one nation, but he was assassinated just days after the war ended." },
+      { id: 76, q: "What did the Emancipation Proclamation do?", a: ["freed the slaves", "freed slaves in the Confederacy", "freed slaves in the Confederate states", "freed slaves in most Southern states"], info: "Issued in 1863, it changed the legal status of over 3.5 million enslaved African Americans from slave to free." },
+      { id: 77, q: "What did Susan B. Anthony do?", a: ["fought for women's rights", "fought for civil rights"], info: "She was a key leader in the women's suffrage movement, advocating fiercely for women's right to vote." },
+      { id: 78, q: "Name one war fought by the United States in the 1900s.", a: ["World War I", "World War 1", "World War II", "World War 2", "Korean War", "Vietnam War", "Gulf War"], info: "The 20th century saw the US emerge as a global superpower, taking major roles in conflicts like WWII and the Cold War." },
+      { id: 79, q: "Who was President during World War I?", a: ["Woodrow Wilson", "Wilson"], info: "Wilson initially kept the US out of the war, running for re-election with the slogan 'He kept us out of war', before joining in 1917." },
+      { id: 80, q: "Who was President during the Great Depression and World War II?", a: ["Franklin Roosevelt", "Roosevelt", "FDR"], info: "FDR is the only US President elected to four terms. He created 'The New Deal' to help Americans during the depression." },
+      { id: 81, q: "Who did the United States fight in World War II?", a: ["Japan, Germany, and Italy", "Japan", "Germany", "Italy"], info: "These three nations were known as the 'Axis Powers'. The US joined the war after the surprise attack on Pearl Harbor." },
+      { id: 82, q: "Before he was President, Eisenhower was a general. What war was he in?", a: ["World War II", "World War 2", "WW2"], info: "Dwight D. Eisenhower served as the Supreme Commander of the Allied Expeditionary Force in Europe during WWII." },
+      { id: 83, q: "During the Cold War, what was the main concern of the United States?", a: ["Communism"], info: "The Cold War was a geopolitical tension between the US (promoting capitalism/democracy) and the Soviet Union (promoting communism)." },
+      { id: 84, q: "What movement tried to end racial discrimination?", a: ["civil rights movement", "civil rights"], info: "The movement peaked in the 1950s and 60s, leading to landmark legislation like the Civil Rights Act of 1964." },
+      { id: 85, q: "What did Martin Luther King, Jr. do?", a: ["fought for civil rights", "worked for equality for all Americans"], info: "He was famous for his nonviolent approach to protesting and gave the iconic 'I Have a Dream' speech in 1963." },
+      { id: 86, q: "What major event happened on September 11, 2001, in the United States?", a: ["Terrorists attacked the United States", "9/11"], info: "Nearly 3,000 people died when hijacked planes struck the World Trade Center, the Pentagon, and a field in Pennsylvania." },
+      { id: 87, q: "Name one American Indian tribe in the United States.", a: ["Cherokee", "Navajo", "Sioux", "Chippewa", "Choctaw", "Pueblo", "Apache", "Iroquois", "Creek", "Blackfeet", "Seminole", "Cheyenne", "Arawak", "Shawnee", "Mohegan", "Huron", "Oneida", "Lakota", "Crow", "Teton", "Hopi", "Inuit"], info: "Today, there are 574 federally recognized Indian Nations (tribes) in the United States." },
+      { id: 88, q: "Name one of the two longest rivers in the United States.", a: ["Missouri", "Mississippi"], info: "The Missouri River is slightly longer than the Mississippi River, flowing 2,341 miles before joining the Mississippi." },
+      { id: 89, q: "What ocean is on the West Coast of the United States?", a: ["Pacific", "Pacific Ocean"], info: "The Pacific is the largest and deepest ocean on Earth, bordering states like California, Oregon, and Washington." },
+      { id: 90, q: "What ocean is on the East Coast of the United States?", a: ["Atlantic", "Atlantic Ocean"], info: "The original 13 colonies were all established along the coast of the Atlantic Ocean." },
+      { id: 91, q: "Name one U.S. territory.", a: ["Puerto Rico", "U.S. Virgin Islands", "American Samoa", "Northern Mariana Islands", "Guam"], info: "Residents of these territories are US nationals (or citizens), but they do not have voting representation in Congress." },
+      { id: 92, q: "Name one state that borders Canada.", a: ["Maine", "New Hampshire", "Vermont", "New York", "Pennsylvania", "Ohio", "Michigan", "Minnesota", "North Dakota", "Montana", "Idaho", "Washington", "Alaska"], info: "The US-Canada border is the longest international border in the world shared between two countries." },
+      { id: 93, q: "Name one state that borders Mexico.", a: ["California", "Arizona", "New Mexico", "Texas"], info: "The Rio Grande river forms a large portion of the natural border between Texas and Mexico." },
+      { id: 94, q: "What is the capital of the United States?", a: ["Washington, D.C.", "Washington DC"], info: "D.C. stands for 'District of Columbia'. It is not a state, but a special federal district created by the Constitution." },
+      { id: 95, q: "Where is the Statue of Liberty?", a: ["New York Harbor", "Liberty Island", "New York", "New Jersey", "Hudson River"], info: "The statue was a gift of friendship from the people of France to the United States and was dedicated in 1886." },
+      { id: 96, q: "Why does the flag have 13 stripes?", a: ["because there were 13 original colonies", "because the stripes represent the original colonies", "13 colonies"], info: "The 13 stripes represent the original 13 colonies that rebelled against the British Crown. The colors are red (valor) and white (purity)." },
+      { id: 97, q: "Why does the flag have 50 stars?", a: ["because there is one star for each state", "because each star represents a state", "because there are 50 states", "50 states"], info: "The 50th star was added in 1960 after Hawaii became a state." },
+      { id: 98, q: "What is the name of the national anthem?", a: ["The Star-Spangled Banner", "Star Spangled Banner"], info: "The lyrics were written by Francis Scott Key during the War of 1812 after witnessing the British bombardment of Fort McHenry." },
+      { id: 99, q: "When do we celebrate Independence Day?", a: ["July 4", "July 4th", "Fourth of July"], info: "It celebrates the passage of the Declaration of Independence by the Continental Congress on July 4, 1776." },
+      { id: 100, q: "Name two national U.S. holidays.", a: ["New Year's Day", "Martin Luther King, Jr. Day", "Presidents' Day", "Memorial Day", "Independence Day", "Labor Day", "Columbus Day", "Veterans Day", "Thanksgiving", "Christmas"], info: "Federal holidays are established by Congress. On these days, non-essential federal government offices are closed." }
+    ];
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Game State
+    const MAX_QUESTIONS = CIVICS_QUESTIONS.length; 
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let hasAnswered = false;
+
+    // DOM Elements
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game: document.getElementById('game-screen'),
+      end: document.getElementById('end-screen')
+    };
+
+    const ui = {
+      progressText: document.getElementById('progress-text'),
+      progressBar: document.getElementById('progress-bar'),
+      scoreText: document.getElementById('score-text'),
+      questionBadge: document.getElementById('question-badge'),
+      questionText: document.getElementById('question-text'),
+      input: document.getElementById('user-input'),
+      checkBtn: document.getElementById('check-btn'),
+      feedbackArea: document.getElementById('feedback-area'),
+      feedbackBox: document.getElementById('feedback-box'),
+      feedbackTitleContainer: document.getElementById('feedback-title-container'),
+      correctAnswersText: document.getElementById('correct-answers-text'),
+      factText: document.getElementById('fact-text'),
+      nextBtnText: document.querySelector('#next-btn span'),
+      endIconContainer: document.getElementById('end-icon-container'),
+      endTitle: document.getElementById('end-title'),
+      finalScore: document.getElementById('final-score'),
+      finalProgress: document.getElementById('final-progress'),
+      form: document.getElementById('answer-form'),
+    };
+
+    // Shuffle Array
+    const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
+
+    // Fuzzy matching
+    const checkAnswer = (userInput, correctAnswers) => {
+      if (!userInput) return false;
+      
+      const normalize = (str) => str.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
+      const normalizedInput = normalize(userInput);
+
+      const synonyms = {
+        "1": "one", "2": "two", "3": "three", "4": "four", "6": "six", "9": "nine",
+        "13": "thirteen", "18": "eighteen", "27": "twenty seven", "50": "fifty", 
+        "100": "one hundred", "435": "four hundred thirty five",
+        "ww1": "world war i", "ww2": "world war ii", "fdr": "roosevelt"
+      };
+
+      for (let ans of correctAnswers) {
+        const normalizedAns = normalize(ans);
+        if (normalizedInput === normalizedAns) return true;
+        if (synonyms[normalizedInput] === normalizedAns || synonyms[normalizedAns] === normalizedInput) return true;
+        if (normalizedInput.includes(normalizedAns) && normalizedAns.length > 3) return true;
+        if (normalizedAns.split(" ").length > 1) {
+           const keywords = normalizedAns.split(" ").filter(w => w.length > 3);
+           if (keywords.some(kw => normalizedInput.includes(kw))) return true;
+        }
+      }
+      return false;
+    };
+
+    // Screen Navigation
+    const showScreen = (screenName) => {
+      Object.values(screens).forEach(s => s.classList.add('hidden-screen'));
+      screens[screenName].classList.remove('hidden-screen');
+    };
+
+    // Start Game
+    window.startGame = () => {
+      currentQuestions = shuffleArray(CIVICS_QUESTIONS).slice(0, MAX_QUESTIONS);
+      currentIndex = 0;
+      score = 0;
+      
+      showScreen('game');
+      renderQuestion();
+    };
+
+    // Render Current Question
+    const renderQuestion = () => {
+      const q = currentQuestions[currentIndex];
+      hasAnswered = false;
+
+      ui.progressText.textContent = `${currentIndex + 1} / ${MAX_QUESTIONS}`;
+      ui.progressBar.style.width = `${((currentIndex + 1) / MAX_QUESTIONS) * 100}%`;
+      ui.scoreText.textContent = score;
+      
+      ui.questionBadge.textContent = `Q#${q.id}`;
+      ui.questionText.textContent = q.q;
+      
+      ui.input.value = '';
+      ui.input.disabled = false;
+      ui.input.focus();
+      
+      ui.checkBtn.classList.remove('hidden-screen');
+      ui.feedbackArea.classList.add('hidden-screen');
+      
+      // Disable check button if input is empty
+      ui.checkBtn.disabled = true;
+    };
+
+    // Input listener to enable 'Check Answer'
+    ui.input.addEventListener('input', (e) => {
+      ui.checkBtn.disabled = e.target.value.trim().length === 0;
+    });
+
+    // Form submission handling
+    ui.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (hasAnswered) return;
+
+      const q = currentQuestions[currentIndex];
+      const isCorrect = checkAnswer(ui.input.value, q.a);
+      hasAnswered = true;
+
+      ui.input.disabled = true;
+      ui.checkBtn.classList.add('hidden-screen');
+      ui.feedbackArea.classList.remove('hidden-screen');
+
+      // Feedback Box styling
+      ui.feedbackBox.className = `p-5 rounded-xl border flex flex-col justify-center ${isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-crimson-light border-crimson/20'}`;
+      
+      let iconHtml = isCorrect 
+        ? `<i data-lucide="check-circle-2" class="text-emerald-500 w-6 h-6"></i>` 
+        : `<i data-lucide="x-circle" class="text-crimson w-6 h-6"></i>`;
+      
+      let titleHtml = `<span class="font-bold text-lg ${isCorrect ? 'text-emerald-600' : 'text-crimson'}">${isCorrect ? 'Correct!' : 'Incorrect'}</span>`;
+      
+      ui.feedbackTitleContainer.innerHTML = iconHtml + titleHtml;
+      ui.correctAnswersText.textContent = q.a.join(' / ');
+      
+      if (isCorrect) score++;
+      ui.scoreText.textContent = score;
+
+      // Update Historic Fact Context
+      ui.factText.textContent = q.info;
+
+      ui.nextBtnText.textContent = currentIndex + 1 >= MAX_QUESTIONS ? 'Show Results' : 'Next Question';
+      
+      lucide.createIcons(); // Render new icons in feedback
+    });
+
+    // Next Question or End Screen
+    window.nextQuestion = () => {
+      if (currentIndex + 1 >= MAX_QUESTIONS) {
+        showEndScreen();
+      } else {
+        currentIndex++;
+        renderQuestion();
+      }
+    };
+
+    // End Screen
+    const showEndScreen = () => {
+      showScreen('end');
+      
+      // Official requirement is 60% passing rate
+      const threshold = Math.ceil(MAX_QUESTIONS * 0.6);
+      const passed = score >= threshold;
+      
+      ui.endIconContainer.className = `w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg text-white ${passed ? 'bg-emerald-500 shadow-emerald-500/30' : 'bg-crimson shadow-crimson/30'}`;
+      ui.endIconContainer.innerHTML = passed 
+        ? `<i data-lucide="check-circle-2" class="w-12 h-12"></i>` 
+        : `<i data-lucide="x-circle" class="w-12 h-12"></i>`;
+        
+      ui.endTitle.textContent = passed ? 'Congratulations! 🎉' : 'Test Failed';
+      ui.finalScore.textContent = `${score} out of ${MAX_QUESTIONS}`;
+      
+      ui.finalProgress.className = `h-3 rounded-full transition-all duration-1000 ${passed ? 'bg-emerald-500' : 'bg-crimson'}`;
+      
+      // Progress bar animation
+      setTimeout(() => {
+        ui.finalProgress.style.width = `${(score / MAX_QUESTIONS) * 100}%`;
+      }, 100);
+
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
