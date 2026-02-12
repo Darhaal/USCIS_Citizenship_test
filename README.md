@@ -61,7 +61,7 @@ This project follows the **"Single File Mandate"** for ease of distribution.
 
 ## 📦 Versioning
 
-* **Current Version:** `1.1.0` (Stable)
+* **Current Version:** `1.1.1` (Stable)
 * **Database:** 128 Questions (2025 Version)
 
 ---
