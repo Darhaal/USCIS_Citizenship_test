@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>USCIS Civics Test</title>
+  <title>USCIS Civics Test - New York</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -56,8 +56,9 @@
       <i data-lucide="award" class="w-10 h-10"></i>
     </div>
     <h1 class="text-3xl font-bold mb-3 tracking-tight text-slate-900">USCIS Civics Test</h1>
+    <h2 class="text-lg font-semibold text-crimson mb-4">🗽 New York Edition</h2>
     <p class="text-slate-500 mb-8 text-sm leading-relaxed">
-      Prepare for your US Citizenship interview. You will be asked 96 universal questions in a random order (state-specific questions are excluded). You need 60% to pass.
+      Prepare for your US Citizenship interview. You will be asked all 100 official questions in a random order (customized for New York State residents). You need 60% to pass.
     </p>
     <button onclick="startGame()" class="w-full bg-crimson hover:bg-crimson-hover text-white font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-crimson/20">
       <i data-lucide="play" class="w-5 h-5"></i>
@@ -71,7 +72,7 @@
     <!-- Progress Bar -->
     <div class="w-full max-w-2xl mb-8 flex items-center gap-4 fade-in">
       <div class="text-sm font-semibold text-slate-400 w-20 text-right" id="progress-text">
-        1 / 96
+        1 / 100
       </div>
       <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
         <div id="progress-bar" class="bg-crimson h-2 rounded-full transition-all duration-300 w-[1%] shadow-[0_0_10px_rgba(220,20,60,0.5)]"></div>
@@ -172,7 +173,7 @@
 
   <!-- === APPLICATION LOGIC === -->
   <script>
-    // === QUESTIONS DATABASE WITH INFO CONTEXT ===
+    // === QUESTIONS DATABASE WITH INFO CONTEXT (100 Questions, NY Edition) ===
     const CIVICS_QUESTIONS = [
       { id: 1, q: "What is the supreme law of the land?", a: ["the Constitution"], info: "The U.S. Constitution is the oldest and shortest written Constitution of any major government in the world, signed in 1787." },
       { id: 2, q: "What does the Constitution do?", a: ["sets up the government", "defines the government", "protects basic rights of Americans"], info: "It establishes the three branches of the federal government: legislative, executive, and judicial, ensuring no single entity has too much power." },
@@ -193,8 +194,16 @@
       { id: 17, q: "What are the two parts of the U.S. Congress?", a: ["the Senate and House", "Senate and House of Representatives"], info: "This bicameral system was created by the 'Great Compromise' of 1787 to balance the power of large and small states." },
       { id: 18, q: "How many U.S. Senators are there?", a: ["100", "one hundred"], info: "Each of the 50 states is given exactly 2 senators, ensuring equal representation for every state regardless of size." },
       { id: 19, q: "We elect a U.S. Senator for how many years?", a: ["6", "six"], info: "Senate terms are staggered so that about one-third of the Senate is up for reelection every two years." },
+      
+      // NEW YORK SPECIFIC: Question 20
+      { id: 20, q: "Who is one of your state's U.S. Senators now? (New York)", a: ["Chuck Schumer", "Schumer", "Kirsten Gillibrand", "Gillibrand"], info: "New York is represented by Senate Majority Leader Chuck Schumer and Senator Kirsten Gillibrand." },
+      
       { id: 21, q: "The House of Representatives has how many voting members?", a: ["435", "four hundred thirty-five"], info: "The number 435 was permanently set by the Reapportionment Act of 1929." },
       { id: 22, q: "We elect a U.S. Representative for how many years?", a: ["2", "two"], info: "Two-year terms are meant to keep Representatives highly responsive to the immediate needs of their local constituents." },
+      
+      // NEW YORK SPECIFIC: Question 23
+      { id: 23, q: "Name your U.S. Representative. (For this app, type 'varies')", a: ["varies", "depends"], info: "New York has 26 U.S. Representatives! Your specific rep depends entirely on your local congressional district. Make sure to look up your specific Representative before your real interview!" },
+
       { id: 24, q: "Who does a U.S. Senator represent?", a: ["all people of the state", "all people"], info: "Before the 17th Amendment in 1913, Senators were chosen by state legislatures, not directly by the people." },
       { id: 25, q: "Why do some states have more Representatives than other states?", a: ["state's population", "they have more people", "some states have more people"], info: "Seats are reallocated every 10 years based on the national census data." },
       { id: 26, q: "We elect a President for how many years?", a: ["4", "four"], info: "The 22nd Amendment limits the President to serving only two elected 4-year terms." },
@@ -214,6 +223,13 @@
       { id: 40, q: "Who is the Chief Justice of the United States now?", a: ["John Roberts", "Roberts"], info: "John Roberts was nominated by President George W. Bush and assumed office in 2005." },
       { id: 41, q: "Under our Constitution, some powers belong to the federal government. What is one power of the federal government?", a: ["to print money", "to declare war", "to create an army", "to make treaties"], info: "These are called 'enumerated powers', specifically listed in Article I, Section 8 of the Constitution." },
       { id: 42, q: "Under our Constitution, some powers belong to the states. What is one power of the states?", a: ["provide schooling and education", "provide protection", "police", "provide safety", "fire departments", "give a driver's license", "approve zoning and land use"], info: "The 10th Amendment dictates that any powers not given to the federal government are reserved for the states and the people." },
+      
+      // NEW YORK SPECIFIC: Question 43
+      { id: 43, q: "Who is the Governor of your state now? (New York)", a: ["Kathy Hochul", "Hochul"], info: "Kathy Hochul became the 57th governor of New York in August 2021. She is the first female governor of the state." },
+      
+      // NEW YORK SPECIFIC: Question 44
+      { id: 44, q: "What is the capital of your state? (New York)", a: ["Albany"], info: "Albany has been the capital of New York since 1797. Many people mistakenly assume the capital is New York City!" },
+
       { id: 45, q: "What are the two major political parties in the United States?", a: ["Democratic and Republican", "Democrats and Republicans"], info: "While there are third parties, the US uses a 'winner-take-all' system that naturally favors a two-party dominance." },
       { id: 46, q: "What is the political party of the President now?", a: ["Democratic", "Democrat"], info: "The Democratic Party's symbol is traditionally the donkey, while the Republican Party's symbol is the elephant." },
       { id: 47, q: "What is the name of the Speaker of the House of Representatives now?", a: ["Mike Johnson", "Johnson"], info: "The Speaker presides over the House and is second in the presidential line of succession, right after the Vice President." },
@@ -276,7 +292,7 @@
     lucide.createIcons();
 
     // Game State
-    const MAX_QUESTIONS = CIVICS_QUESTIONS.length; 
+    const MAX_QUESTIONS = CIVICS_QUESTIONS.length; // Now exactly 100
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
