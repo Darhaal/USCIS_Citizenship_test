@@ -1,38 +1,72 @@
-# USCIS Civics Test Prep 🇺🇸
+# USCIS Civics Test Prep - 2026 Official Edition
 
-A sleek, modern, and interactive web application designed to help candidates prepare for the United States Naturalization (Civics) Test. 
+A modern, interactive web application to help applicants prepare for the U.S. Citizenship Naturalization Test. Updated for the **2025/2026 testing cycle**, including the full **128-question** database.
 
-Built entirely with Vanilla JavaScript and Tailwind CSS, this app requires no build process and runs directly in any modern web browser.
+---
 
-## ✨ Features
+## 🌟 Key Features
 
-* 🧠 **Smart Answer Checking (Fuzzy Matching):** You don't need to type the answer perfectly. The app ignores punctuation, capitalization, and recognizes numbers (e.g., "50" instead of "fifty"), synonyms, and partial keywords.
-* 📚 **96 Universal Questions:** Includes all official USCIS questions (excluding the 4 state-specific questions like "Who is your Governor?" which cannot be automatically verified).
-* 🔀 **Randomized Order:** Questions are presented in a random order every time you start a new session, simulating the real interview experience.
-* 💡 **Historical Context:** Every question comes with a unique "Did you know?" fact to make studying more engaging and help with memorization.
-* 📊 **Real-time Statistics:** Track your progress, correct answers, and remaining questions dynamically.
-* 🎨 **Modern UI/UX:** Clean, accessible, and responsive design built with Tailwind CSS and Lucide Icons.
+* **📚 Official 128 Question Bank**
+  Fully updated to match the **USCIS M-1778 (09/25)** version.
 
-## 🚀 How to Run
+* **📍 Location Awareness**
+  Automatically detects your state/ZIP to provide the correct answers for:
+  * Governor
+  * U.S. Senators
+  * U.S. Representative
+  * State Capital
 
-Since this project uses Vanilla JS and CDN links for styling, there is absolutely **no installation or build step required**.
+* **👴 65/20 Rule Support**
+  Visual badges (**"65/20 Rule"**) for questions required for applicants age **65+** with **20 years** of residency.
 
-1. Clone or download this repository.
-2. Open `index.html` in your favorite web browser.
-3. Start practicing!
+* **🎓 Two Study Modes**
+  * **Quiz Mode:** Interactive typing practice with fuzzy matching algorithms (forgives minor typos).
+  * **Flashcard Mode:** Classic flip-card style for memorization with self-rating ("Got it" vs "Review").
 
-## 🛠️ Tech Stack
+* **💾 Progress Tracking**
+  Saves your session stats and location settings automatically (**Local Storage**).
 
-* **HTML5 & CSS3**
-* **Vanilla JavaScript** (ES6+)
-* **[Tailwind CSS](https://tailwindcss.com/)** (via CDN)
-* **[Lucide Icons](https://lucide.dev/)** (via CDN)
+* **✨ Modern Design**
+  Glassmorphism UI, smooth animations, and fully responsive layout using **Tailwind CSS**.
 
-## 🤝 Contributing
+---
 
-Contributions, issues, and feature requests are welcome! 
-Feel free to check the [issues page](link-to-your-issues-page).
+## 🚀 How to Use
 
-## 📝 License
+This project follows the **"Single File Mandate"** for ease of distribution.
 
-This project is open-source and available under the [MIT License](LICENSE).
+1. **⬇️ Download**
+   Get the `index.html` file.
+
+2. **▶️ Run**
+   Simply open `index.html` in any modern web browser (Chrome, Safari, Edge).
+
+3. **⚙️ Setup**
+   * Select your **State**.
+   * (Optional) Enter your **ZIP code** to fetch your specific U.S. Representative.
+
+4. **🧠 Study**
+   Choose a mode and **start learning!**
+
+---
+
+## 🛠 Tech Stack
+
+* **HTML5:** Semantic structure.
+* **Tailwind CSS:** Utility-first styling (loaded via CDN).
+* **Vanilla JavaScript:** No frameworks (React/Vue/Angular) required. All logic, state management, and data are contained within the single file.
+* **Lucide Icons:** Beautiful, open-source vector icons.
+
+---
+
+## 📦 Versioning
+
+* **Current Version:** `1.1.0` (Stable)
+* **Database:** 128 Questions (2025 Version)
+
+---
+
+## 📄 License
+
+This project is open-source and available for educational purposes.
+Questions and answers are sourced from public domain **USCIS** materials.
