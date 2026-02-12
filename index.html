@@ -177,7 +177,7 @@
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-red"></span>
                     </span>
-                <span class="text-[10px] font-bold tracking-wide">v1.1.0 Updated for Jan 2026</span>
+                <span class="text-[10px] font-bold tracking-wide">Updated for 2026</span>
             </div>
             <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 mb-2">
                 Let's Ace This.
@@ -456,7 +456,7 @@
         }
     };
 
-    // --- 3. CATEGORIES (Updated for 128 Questions structure) ---
+    // --- 3. CATEGORIES ---
     const CATEGORIES = [
         { id: 'all', label: 'All Questions', icon: 'layout-grid', color: 'text-brand-red', desc: '128 Questions' },
         { id: 'principles', label: 'Principles', icon: 'scale', color: 'text-blue-600', desc: 'Q 1-15' },
@@ -477,7 +477,103 @@
         return new Promise(resolve => setTimeout(() => resolve(MOCKS[zip] || null), 500));
     }
 
-    // --- NEW 128 QUESTION DATABASE (2025/2026 Version) ---
+    // --- EXTENSIVE PROFESSIONAL SYNONYM DICTIONARY ---
+    // This dictionary handles common variations, abbreviations, numbers, and synonyms
+    // found in civics tests to provide "fuzzy" matching and prevent typo rejections.
+    const SYNONYM_DICT = {
+        // Numbers (Convert written to digit for standard comparison)
+        "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+        "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
+        "eleven": "11", "twelve": "12", "thirteen": "13", "twenty seven": "27", "twenty-seven": "27",
+        "fifty": "50", "eighteen": "18", "twenty six": "26", "twenty-six": "26",
+        "four hundred thirty five": "435", "four hundred thirty-five": "435", "100": "one hundred",
+
+        // Government Terms
+        "legislative branch": "congress",
+        "legislative": "congress",
+        "executive branch": "president",
+        "executive": "president",
+        "judicial branch": "courts",
+        "judicial": "courts",
+        "judiciary": "courts",
+        "scotus": "supreme court",
+        "potus": "president",
+        "vp": "vice president",
+        "ag": "attorney general",
+        "house": "house of representatives",
+        "lower house": "house of representatives",
+        "upper house": "senate",
+        "law making branch": "congress",
+        "law enforcing branch": "president",
+
+        // Concepts
+        "free market": "capitalism",
+        "free market economy": "capitalism",
+        "market economy": "capitalism",
+        "freedom of expression": "speech",
+        "freedom of speech": "speech",
+        "free speech": "speech",
+        "freedom of religion": "religion",
+        "freedom to worship": "religion",
+        "right to bear arms": "arms",
+        "bear arms": "arms",
+        "change": "amendment",
+        "addition": "amendment",
+
+        // History & Wars
+        "revolutionary war": "american revolution",
+        "war of 1812": "1812",
+        "civil war": "war between the states",
+        "war between the states": "civil war",
+        "ww1": "world war one",
+        "wwi": "world war one",
+        "world war 1": "world war one",
+        "first world war": "world war one",
+        "great war": "world war one",
+        "ww2": "world war two",
+        "wwii": "world war two",
+        "world war 2": "world war two",
+        "second world war": "world war two",
+
+        // People (Canonical Names)
+        "george washington": "washington",
+        "thomas jefferson": "jefferson",
+        "james madison": "madison",
+        "alexander hamilton": "hamilton",
+        "abraham lincoln": "lincoln",
+        "franklin roosevelt": "fdr", // mapping normalized to short for easier checking or vice versa
+        "roosevelt": "fdr",
+        "franklin d roosevelt": "fdr",
+        "dwight eisenhower": "eisenhower",
+        "ike": "eisenhower",
+        "martin luther king": "mlk",
+        "martin luther king jr": "mlk",
+        "king": "mlk",
+        "woodrow wilson": "wilson",
+        "susan b anthony": "anthony",
+        "susan anthony": "anthony",
+
+        // Places & Symbols
+        "usa": "united states",
+        "u.s.a.": "united states",
+        "us": "united states",
+        "u.s.": "united states",
+        "america": "united states",
+        "united states of america": "united states",
+        "nyc": "new york",
+        "dc": "washington dc",
+        "d.c.": "washington dc",
+        "district of columbia": "washington dc",
+        "star spangled banner": "the star-spangled banner",
+        "national anthem": "the star-spangled banner",
+        "old glory": "flag",
+        "stars and stripes": "flag",
+        "september 11": "9/11",
+        "9-11": "9/11",
+        "sept 11": "9/11"
+    };
+
+    // --- 128 QUESTION DATABASE ---
     const QUESTIONS_DB = (stateData) => {
         const zipLink = APP_STATE.location.zip
             ? `https://www.house.gov/representatives/find-your-representative?zip=${APP_STATE.location.zip}`
@@ -489,149 +585,147 @@
             : { id: 29, c: 'system', q: "Name your U.S. representative.", a: ["*"], info: `Depends on your district. <a href="${zipLink}" target="_blank" class="underline text-blue-600">Check here</a>.` };
 
         return [
-            // A: Principles of American Government
-            { id: 1, c: 'principles', q: "What is the form of government of the United States?", a: ["Republic", "Constitution-based federal republic", "Representative democracy"], info: "A system where citizens rule through elected representatives." },
-            { id: 2, c: 'principles', q: "What is the supreme law of the land?", a: ["U.S. Constitution", "Constitution"], info: "It establishes the basic framework of the US government.", is6520: true },
-            { id: 3, c: 'principles', q: "Name one thing the U.S. Constitution does.", a: ["Forms the government", "Defines powers of government", "Defines the parts of government", "Protects the rights of the people"], info: "The foundation of our legal system." },
-            { id: 4, c: 'principles', q: "The U.S. Constitution starts with the words \"We the People.\" What does \"We the People\" mean?", a: ["Self-government", "Popular sovereignty", "Consent of the governed", "People should govern themselves", "Social contract"], info: "Power comes from the citizens." },
-            { id: 5, c: 'principles', q: "How are changes made to the U.S. Constitution?", a: ["Amendments", "The amendment process"], info: "It allows the document to evolve." },
-            { id: 6, c: 'principles', q: "What does the Bill of Rights protect?", a: ["The basic rights of Americans", "The basic rights of people living in the United States"], info: "The first ten amendments." },
-            { id: 7, c: 'principles', q: "How many amendments does the U.S. Constitution have?", a: ["27", "Twenty-seven"], info: "The most recent one was ratified in 1992.", is6520: true },
-            { id: 8, c: 'principles', q: "Why is the Declaration of Independence important?", a: ["It says America is free from British control", "It says all people are created equal", "It identifies inherent rights", "It identifies individual freedoms"], info: "A key founding document." },
-            { id: 9, c: 'principles', q: "What founding document said the American colonies were free from Britain?", a: ["Declaration of Independence"], info: "Adopted in 1776." },
+            // A: Principles (1-15)
+            { id: 1, c: 'principles', q: "What is the form of government of the United States?", a: ["Republic", "Constitution-based federal republic", "Representative democracy"], info: "Citizens rule through elected representatives." },
+            { id: 2, c: 'principles', q: "What is the supreme law of the land?", a: ["Constitution"], info: "Establishes framework.", is6520: true },
+            { id: 3, c: 'principles', q: "Name one thing the U.S. Constitution does.", a: ["Forms the government", "Defines powers", "Protects rights"], info: "Foundation of law." },
+            { id: 4, c: 'principles', q: "The U.S. Constitution starts with \"We the People.\" What does this mean?", a: ["Self-government", "Popular sovereignty", "People govern themselves"], info: "Power from the people." },
+            { id: 5, c: 'principles', q: "How are changes made to the U.S. Constitution?", a: ["Amendments"], info: "Allows evolution." },
+            { id: 6, c: 'principles', q: "What does the Bill of Rights protect?", a: ["Basic rights of Americans", "Rights of people"], info: "First 10 amendments." },
+            { id: 7, c: 'principles', q: "How many amendments does the U.S. Constitution have?", a: ["27"], info: "Ratified in 1992.", is6520: true },
+            { id: 8, c: 'principles', q: "Why is the Declaration of Independence important?", a: ["Says America is free", "All people created equal", "Identifies rights"], info: "Founding document." },
+            { id: 9, c: 'principles', q: "What founding document said the American colonies were free from Britain?", a: ["Declaration of Independence"], info: "1776." },
             { id: 10, c: 'principles', q: "Name two important ideas from the Declaration of Independence and the U.S. Constitution.", a: ["Equality", "Liberty", "Social contract", "Natural rights", "Limited government", "Self-government"], info: "Pick any two." },
             { id: 11, c: 'principles', q: "The words \"Life, Liberty, and the pursuit of Happiness\" are in what founding document?", a: ["Declaration of Independence"], info: "Unalienable rights." },
-            { id: 12, c: 'principles', q: "What is the economic system of the United States?", a: ["Capitalism", "Free market economy"], info: "Private ownership of business.", is6520: true },
-            { id: 13, c: 'principles', q: "What is the rule of law?", a: ["Everyone must follow the law", "Leaders must obey the law", "Government must obey the law", "No one is above the law"], info: "Fairness in the legal system." },
-            { id: 14, c: 'principles', q: "Many documents influenced the U.S. Constitution. Name one.", a: ["Declaration of Independence", "Articles of Confederation", "Federalist Papers", "Anti-Federalist Papers", "Virginia Declaration of Rights", "Fundamental Orders of Connecticut", "Mayflower Compact", "Iroquois Great Law of Peace"], info: "Pick one." },
-            { id: 15, c: 'principles', q: "There are three branches of government. Why?", a: ["So one part does not become too powerful", "Checks and balances", "Separation of powers"], info: "To prevent tyranny." },
+            { id: 12, c: 'principles', q: "What is the economic system of the United States?", a: ["Capitalism", "Free market economy"], info: "Private ownership.", is6520: true },
+            { id: 13, c: 'principles', q: "What is the rule of law?", a: ["Everyone must follow the law", "Leaders must obey the law", "No one is above the law"], info: "Legal fairness." },
+            { id: 14, c: 'principles', q: "Many documents influenced the U.S. Constitution. Name one.", a: ["Declaration of Independence", "Articles of Confederation", "Federalist Papers", "Mayflower Compact"], info: "Pick one." },
+            { id: 15, c: 'principles', q: "There are three branches of government. Why?", a: ["Checks and balances", "Separation of powers", "Prevent too much power"], info: "Prevents tyranny." },
 
-            // B: System of Government
-            { id: 16, c: 'system', q: "Name the three branches of government.", a: ["Legislative, executive, and judicial", "Congress, president, and the courts"], info: "The structure of federal power." },
-            { id: 17, c: 'system', q: "The President of the United States is in charge of which branch of government?", a: ["Executive branch"], info: "Enforces the laws." },
-            { id: 18, c: 'system', q: "What part of the federal government writes laws?", a: ["U.S. Congress", "Congress", "Legislature", "Legislative branch"], info: "The law-making body." },
-            { id: 19, c: 'system', q: "What are the two parts of the U.S. Congress?", a: ["Senate and House", "Senate and House of Representatives"], info: "Bicameral legislature." },
-            { id: 20, c: 'system', q: "Name one power of the U.S. Congress.", a: ["Writes laws", "Declares war", "Makes the federal budget"], info: "Enumerated powers.", is6520: true },
-            { id: 21, c: 'system', q: "How many U.S. senators are there?", a: ["100", "One hundred"], info: "2 per state." },
-            { id: 22, c: 'system', q: "How long is a term for a U.S. senator?", a: ["6 years", "Six years"], info: "Unlimited terms allowed." },
-            { id: 23, c: 'system', q: "Who is one of your state's U.S. senators now?", a: stateData.senators, info: `Senators for ${stateData.name}: ${stateData.senators.join(', ')}.` },
-            { id: 24, c: 'system', q: "How many voting members are in the House of Representatives?", a: ["435", "Four hundred thirty-five"], info: "Based on population." },
-            { id: 25, c: 'system', q: "How long is a term for a member of the House of Representatives?", a: ["2 years", "Two years"], info: "Short terms to reflect public opinion." },
-            { id: 26, c: 'system', q: "Why do U.S. representatives serve shorter terms than U.S. senators?", a: ["To more closely follow public opinion"], info: "They are the 'People's House'." },
-            { id: 27, c: 'system', q: "How many senators does each state have?", a: ["2", "Two"], info: "Equal representation." },
-            { id: 28, c: 'system', q: "Why does each state have two senators?", a: ["Equal representation", "The Great Compromise", "Connecticut Compromise"], info: "Protects small states." },
-            repQuestion, // Q29
-            { id: 30, c: 'system', q: "What is the name of the Speaker of the House of Representatives now?", a: ["Mike Johnson", "Johnson"], info: "3rd in line for Presidency.", is6520: true },
-            { id: 31, c: 'system', q: "Who does a U.S. senator represent?", a: ["Citizens of their state", "People of their state"], info: "The entire state." },
-            { id: 32, c: 'system', q: "Who elects U.S. senators?", a: ["Citizens from their state"], info: "Direct election (17th Amendment)." },
-            { id: 33, c: 'system', q: "Who does a member of the House of Representatives represent?", a: ["Citizens in their district", "People in their district"], info: "Specific geographic area." },
-            { id: 34, c: 'system', q: "Who elects members of the House of Representatives?", a: ["Citizens from their district"], info: "Local representation." },
-            { id: 35, c: 'system', q: "Some states have more representatives than other states. Why?", a: ["State's population", "They have more people"], info: "Proportional representation." },
-            { id: 36, c: 'system', q: "The President of the United States is elected for how many years?", a: ["4 years", "Four years"], info: "One term length.", is6520: true },
-            { id: 37, c: 'system', q: "The President of the United States can serve only two terms. Why?", a: ["22nd Amendment", "To keep the president from becoming too powerful"], info: "Prevents dictatorship." },
-            { id: 38, c: 'system', q: "What is the name of the President of the United States now?", a: ["Donald Trump", "Trump"], info: "47th President.", is6520: true },
-            { id: 39, c: 'system', q: "What is the name of the Vice President of the United States now?", a: ["JD Vance", "Vance"], info: "Current VP.", is6520: true },
-            { id: 40, c: 'system', q: "If the president can no longer serve, who becomes president?", a: ["The Vice President"], info: "Succession order." },
-            { id: 41, c: 'system', q: "Name one power of the president.", a: ["Signs bills into law", "Vetoes bills", "Enforces laws", "Commander in Chief", "Chief diplomat", "Appoints federal judges"], info: "Executive powers." },
-            { id: 42, c: 'system', q: "Who is Commander in Chief of the U.S. military?", a: ["The President"], info: "Civilian control." },
-            { id: 43, c: 'system', q: "Who signs bills to become laws?", a: ["The President"], info: "Legislative role." },
-            { id: 44, c: 'system', q: "Who vetoes bills?", a: ["The President"], info: "Executive check on Congress.", is6520: true },
-            { id: 45, c: 'system', q: "Who appoints federal judges?", a: ["The President"], info: "With Senate confirmation." },
-            { id: 46, c: 'system', q: "The executive branch has many parts. Name one.", a: ["President", "Cabinet", "Federal departments and agencies"], info: "Structure of the branch." },
-            { id: 47, c: 'system', q: "What does the President's Cabinet do?", a: ["Advises the President"], info: "Top advisors." },
-            { id: 48, c: 'system', q: "What are two Cabinet-level positions?", a: ["Attorney General", "Secretary of Agriculture", "Secretary of Commerce", "Secretary of Defense", "Secretary of Education", "Secretary of Energy", "Secretary of Health and Human Services", "Secretary of Homeland Security", "Secretary of Housing and Urban Development", "Secretary of the Interior", "Secretary of Labor", "Secretary of State", "Secretary of Transportation", "Secretary of the Treasury", "Secretary of Veterans Affairs", "Vice President"], info: "Pick any two." },
-            { id: 49, c: 'system', q: "Why is the Electoral College important?", a: ["It decides who is elected president", "It provides a compromise between popular election and congressional selection"], info: "Unique election system." },
-            { id: 50, c: 'system', q: "What is one part of the judicial branch?", a: ["Supreme Court", "Federal Courts"], info: "Legal system." },
-            { id: 51, c: 'system', q: "What does the judicial branch do?", a: ["Reviews laws", "Explains laws", "Resolves disputes", "Decides if a law goes against the Constitution"], info: "Interpretive power." },
-            { id: 52, c: 'system', q: "What is the highest court in the United States?", a: ["Supreme Court"], info: "Final appeal.", is6520: true },
-            { id: 53, c: 'system', q: "How many seats are on the Supreme Court?", a: ["9", "Nine"], info: "Since 1869." },
-            { id: 54, c: 'system', q: "How many Supreme Court justices are usually needed to decide a case?", a: ["5", "Five"], info: "Simple majority." },
-            { id: 55, c: 'system', q: "How long do Supreme Court justices serve?", a: ["For life", "Lifetime appointment", "Until retirement"], info: "To ensure independence." },
-            { id: 56, c: 'system', q: "Supreme Court justices serve for life. Why?", a: ["To be independent", "To limit outside influence", "Limit political influence"], info: "Judicial independence." },
-            { id: 57, c: 'system', q: "Who is the Chief Justice of the United States now?", a: ["John Roberts", "Roberts"], info: "Presides over the court." },
-            { id: 58, c: 'system', q: "Name one power that is only for the federal government.", a: ["Print paper money", "Mint coins", "Declare war", "Create an army", "Make treaties", "Set foreign policy"], info: "Enumerated powers." },
-            { id: 59, c: 'system', q: "Name one power that is only for the states.", a: ["Provide schooling and education", "Provide protection", "Police", "Provide safety", "Fire departments", "Give a driver's license", "Approve zoning and land use"], info: "Reserved powers." },
-            { id: 60, c: 'system', q: "What is the purpose of the 10th Amendment?", a: ["Powers not given to the federal government belong to the states or people"], info: "States' rights." },
-            { id: 61, c: 'system', q: "Who is the governor of your state now?", a: [stateData.governor], info: `Current Governor: ${stateData.governor}`, is6520: true },
+            // B: System (16-62)
+            { id: 16, c: 'system', q: "Name the three branches of government.", a: ["Legislative, executive, judicial", "Congress, president, courts"], info: "Power structure." },
+            { id: 17, c: 'system', q: "The President is in charge of which branch?", a: ["Executive"], info: "Enforces laws." },
+            { id: 18, c: 'system', q: "What part of the federal government writes laws?", a: ["Congress", "Legislature"], info: "Makes laws." },
+            { id: 19, c: 'system', q: "What are the two parts of the U.S. Congress?", a: ["Senate and House"], info: "Bicameral." },
+            { id: 20, c: 'system', q: "Name one power of the U.S. Congress.", a: ["Writes laws", "Declares war", "Makes budget"], info: "Enumerated powers.", is6520: true },
+            { id: 21, c: 'system', q: "How many U.S. senators are there?", a: ["100"], info: "2 per state." },
+            { id: 22, c: 'system', q: "How long is a term for a U.S. senator?", a: ["6 years"], info: "Unlimited terms." },
+            { id: 23, c: 'system', q: "Who is one of your state's U.S. senators now?", a: stateData.senators, info: `Senators: ${stateData.senators.join(', ')}.` },
+            { id: 24, c: 'system', q: "How many voting members in the House?", a: ["435"], info: "By population." },
+            { id: 25, c: 'system', q: "How long is a term for a member of the House?", a: ["2 years"], info: "Short terms." },
+            { id: 26, c: 'system', q: "Why do representatives serve shorter terms than senators?", a: ["Follow public opinion"], info: "People's House." },
+            { id: 27, c: 'system', q: "How many senators does each state have?", a: ["2"], info: "Equality." },
+            { id: 28, c: 'system', q: "Why does each state have two senators?", a: ["Equal representation", "Great Compromise"], info: "Protects small states." },
+            repQuestion,
+            { id: 30, c: 'system', q: "What is the name of the Speaker of the House now?", a: ["Mike Johnson", "Johnson"], info: "3rd in line.", is6520: true },
+            { id: 31, c: 'system', q: "Who does a U.S. senator represent?", a: ["Citizens of their state"], info: "Entire state." },
+            { id: 32, c: 'system', q: "Who elects U.S. senators?", a: ["Citizens from their state"], info: "Direct vote." },
+            { id: 33, c: 'system', q: "Who does a representative represent?", a: ["Citizens in their district"], info: "Local area." },
+            { id: 34, c: 'system', q: "Who elects representatives?", a: ["Citizens from their district"], info: "Local vote." },
+            { id: 35, c: 'system', q: "Why do some states have more representatives?", a: ["Population", "More people"], info: "Proportional." },
+            { id: 36, c: 'system', q: "The President is elected for how many years?", a: ["4 years"], info: "One term.", is6520: true },
+            { id: 37, c: 'system', q: "The President can serve only two terms. Why?", a: ["22nd Amendment", "Prevent too much power"], info: "Term limits." },
+            { id: 38, c: 'system', q: "What is the name of the President now?", a: ["Donald Trump", "Trump"], info: "47th President.", is6520: true },
+            { id: 39, c: 'system', q: "What is the name of the Vice President now?", a: ["JD Vance", "Vance"], info: "Current VP.", is6520: true },
+            { id: 40, c: 'system', q: "If the president can no longer serve, who becomes president?", a: ["Vice President"], info: "Succession." },
+            { id: 41, c: 'system', q: "Name one power of the president.", a: ["Signs bills", "Vetoes bills", "Enforces laws", "Commander in Chief"], info: "Executive power." },
+            { id: 42, c: 'system', q: "Who is Commander in Chief of the military?", a: ["The President"], info: "Civilian control." },
+            { id: 43, c: 'system', q: "Who signs bills to become laws?", a: ["The President"], info: "Approval." },
+            { id: 44, c: 'system', q: "Who vetoes bills?", a: ["The President"], info: "Rejection.", is6520: true },
+            { id: 45, c: 'system', q: "Who appoints federal judges?", a: ["The President"], info: "Appointments." },
+            { id: 46, c: 'system', q: "The executive branch has many parts. Name one.", a: ["President", "Cabinet", "Departments"], info: "Structure." },
+            { id: 47, c: 'system', q: "What does the President's Cabinet do?", a: ["Advises the President"], info: "Advisors." },
+            { id: 48, c: 'system', q: "What are two Cabinet-level positions?", a: ["Attorney General", "Secretary of State", "Secretary of Defense", "Vice President", "Secretary of Education"], info: "Pick 2." },
+            { id: 49, c: 'system', q: "Why is the Electoral College important?", a: ["Decides who is elected", "Compromise"], info: "Election system." },
+            { id: 50, c: 'system', q: "What is one part of the judicial branch?", a: ["Supreme Court", "Federal Courts"], info: "Courts." },
+            { id: 51, c: 'system', q: "What does the judicial branch do?", a: ["Reviews laws", "Explains laws", "Resolves disputes"], info: "Interpretation." },
+            { id: 52, c: 'system', q: "What is the highest court in the United States?", a: ["Supreme Court"], info: "Top court.", is6520: true },
+            { id: 53, c: 'system', q: "How many seats are on the Supreme Court?", a: ["9"], info: "Nine justices." },
+            { id: 54, c: 'system', q: "How many justices are needed to decide a case?", a: ["5"], info: "Majority." },
+            { id: 55, c: 'system', q: "How long do Supreme Court justices serve?", a: ["Life", "Lifetime"], info: "Independence." },
+            { id: 56, c: 'system', q: "Supreme Court justices serve for life. Why?", a: ["To be independent", "Limit political influence"], info: "Fairness." },
+            { id: 57, c: 'system', q: "Who is the Chief Justice now?", a: ["John Roberts", "Roberts"], info: "Head justice." },
+            { id: 58, c: 'system', q: "Name one power only for the federal government.", a: ["Print money", "Declare war", "Make treaties"], info: "Enumerated." },
+            { id: 59, c: 'system', q: "Name one power only for the states.", a: ["Schooling", "Police", "Driver's license"], info: "Reserved." },
+            { id: 60, c: 'system', q: "What is the purpose of the 10th Amendment?", a: ["Powers to states or people"], info: "States rights." },
+            { id: 61, c: 'system', q: "Who is the governor of your state now?", a: [stateData.governor], info: `Governor: ${stateData.governor}`, is6520: true },
             { id: 62, c: 'system', q: "What is the capital of your state?", a: [stateData.capital], info: `Capital: ${stateData.capital}` },
 
-            // C: Rights and Responsibilities
-            { id: 63, c: 'rights', q: "There are four amendments to the U.S. Constitution about who can vote. Describe one of them.", a: ["Citizens eighteen and older", "You don't have to pay a poll tax", "Any citizen can vote", "A male citizen of any race can vote"], info: "Evolution of suffrage." },
-            { id: 64, c: 'rights', q: "Who can vote in federal elections, run for federal office, and serve on a jury in the United States?", a: ["Citizens", "Citizens of the United States", "U.S. citizens"], info: "Rights of citizenship." },
-            { id: 65, c: 'rights', q: "What are three rights of everyone living in the United States?", a: ["Freedom of expression", "Freedom of speech", "Freedom of assembly", "Freedom to petition the government", "Freedom of religion", "Right to bear arms"], info: "Universal rights." },
-            { id: 66, c: 'rights', q: "What do we show loyalty to when we say the Pledge of Allegiance?", a: ["The United States", "The flag"], info: "Patriotic oath.", is6520: true },
-            { id: 67, c: 'rights', q: "Name two promises that new citizens make in the Oath of Allegiance.", a: ["Give up loyalty to other countries", "Defend the Constitution", "Obey the laws", "Serve in the military", "Serve the nation", "Be loyal to the United States"], info: "Naturalization oath." },
-            { id: 68, c: 'rights', q: "How can people become United States citizens?", a: ["Be born in the United States", "Naturalize", "Derive citizenship"], info: "Paths to citizenship." },
-            { id: 69, c: 'rights', q: "What are two examples of civic participation in the United States?", a: ["Vote", "Run for office", "Join a political party", "Help with a campaign", "Join a civic group", "Contact elected officials", "Write to a newspaper"], info: "Active citizenship." },
-            { id: 70, c: 'rights', q: "What is one way Americans can serve their country?", a: ["Vote", "Pay taxes", "Obey the law", "Serve in the military", "Run for office", "Work for government"], info: "Service." },
-            { id: 71, c: 'rights', q: "Why is it important to pay federal taxes?", a: ["Required by law", "Fund the federal government", "Civic duty", "16th Amendment"], info: "Funding the nation." },
-            { id: 72, c: 'rights', q: "It is important for all men age 18 through 25 to register for the Selective Service. Name one reason why.", a: ["Required by law", "Civic duty", "Makes the draft fair"], info: "Defense readiness." },
+            // C: Rights (63-72)
+            { id: 63, c: 'rights', q: "There are four amendments about who can vote. Describe one.", a: ["Citizens 18 and older", "No poll tax", "Any citizen", "Male citizen of any race"], info: "Voting rights." },
+            { id: 64, c: 'rights', q: "Who can vote in federal elections?", a: ["Citizens", "U.S. citizens"], info: "Citizen right." },
+            { id: 65, c: 'rights', q: "What are three rights of everyone living in the US?", a: ["Expression", "Speech", "Assembly", "Petition", "Religion", "Arms"], info: "Universal rights." },
+            { id: 66, c: 'rights', q: "What do we show loyalty to when saying the Pledge?", a: ["United States", "Flag"], info: "Patriotism.", is6520: true },
+            { id: 67, c: 'rights', q: "Name two promises new citizens make.", a: ["Defend Constitution", "Obey laws", "Serve military", "Be loyal"], info: "Oath." },
+            { id: 68, c: 'rights', q: "How can people become US citizens?", a: ["Birth", "Naturalize", "Derive"], info: "Citizenship paths." },
+            { id: 69, c: 'rights', q: "Two examples of civic participation?", a: ["Vote", "Run for office", "Join party", "Contact officials"], info: "Engagement." },
+            { id: 70, c: 'rights', q: "One way Americans can serve their country?", a: ["Vote", "Pay taxes", "Military", "Obey law"], info: "Duty." },
+            { id: 71, c: 'rights', q: "Why is it important to pay federal taxes?", a: ["Required by law", "Fund government", "Civic duty"], info: "Funding." },
+            { id: 72, c: 'rights', q: "Why register for Selective Service (men 18-25)?", a: ["Required by law", "Civic duty", "Draft fair"], info: "Defense." },
 
-            // History A: Colonial Period and Independence
-            { id: 73, c: 'colonial', q: "The colonists came to America for many reasons. Name one.", a: ["Freedom", "Political liberty", "Religious freedom", "Economic opportunity", "Escape persecution"], info: "Origins." },
-            { id: 74, c: 'colonial', q: "Who lived in America before the Europeans arrived?", a: ["American Indians", "Native Americans"], info: "Indigenous people.", is6520: true },
-            { id: 75, c: 'colonial', q: "What group of people was taken and sold as slaves?", a: ["Africans", "People from Africa"], info: "Slavery history." },
-            { id: 76, c: 'colonial', q: "What war did the Americans fight to win independence from Britain?", a: ["American Revolution", "Revolutionary War", "War for Independence"], info: "1775-1783." },
-            { id: 77, c: 'colonial', q: "Name one reason why the Americans declared independence from Britain.", a: ["High taxes", "Taxation without representation", "Quartering", "No self-government", "Boston Massacre", "Boston Tea Party", "Stamp Act"], info: "Causes of revolution." },
-            { id: 78, c: 'colonial', q: "Who wrote the Declaration of Independence?", a: ["Thomas Jefferson", "Jefferson"], info: "Primary author.", is6520: true },
-            { id: 79, c: 'colonial', q: "When was the Declaration of Independence adopted?", a: ["July 4 1776"], info: "Independence Day.", is6520: true },
-            { id: 80, c: 'colonial', q: "The American Revolution had many important events. Name one.", a: ["Battle of Bunker Hill", "Declaration of Independence", "Washington Crossing the Delaware", "Battle of Saratoga", "Valley Forge", "Battle of Yorktown"], info: "Key moments." },
-            { id: 81, c: 'colonial', q: "There were 13 original states. Name five.", a: ["New Hampshire", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania", "Delaware", "Maryland", "Virginia", "North Carolina", "South Carolina", "Georgia"], info: "Pick 5." },
-            { id: 82, c: 'colonial', q: "What founding document was written in 1787?", a: ["U.S. Constitution", "Constitution"], info: "Supreme law drafted." },
-            { id: 83, c: 'colonial', q: "The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.", a: ["James Madison", "Alexander Hamilton", "John Jay", "Publius"], info: "Ratification debate." },
-            { id: 84, c: 'colonial', q: "Why were the Federalist Papers important?", a: ["Helped people understand the Constitution", "Supported passing the Constitution"], info: "Political philosophy." },
-            { id: 85, c: 'colonial', q: "Benjamin Franklin is famous for many things. Name one.", a: ["Founded first free public libraries", "First Postmaster General", "Helped write Declaration of Independence", "Inventor", "U.S. diplomat"], info: "Polymath." },
-            { id: 86, c: 'colonial', q: "George Washington is famous for many things. Name one.", a: ["Father of Our Country", "First president", "General of Continental Army"], info: "First President.", is6520: true },
-            { id: 87, c: 'colonial', q: "Thomas Jefferson is famous for many things. Name one.", a: ["Writer of Declaration of Independence", "Third president", "Doubled size of US", "Louisiana Purchase", "First Secretary of State"], info: "Third President." },
-            { id: 88, c: 'colonial', q: "James Madison is famous for many things. Name one.", a: ["Father of the Constitution", "Fourth president", "President during War of 1812", "Writer of Federalist Papers"], info: "Fourth President." },
-            { id: 89, c: 'colonial', q: "Alexander Hamilton is famous for many things. Name one.", a: ["First Secretary of the Treasury", "Writer of Federalist Papers", "First Bank of the United States", "Aide to Washington"], info: "Founding Father." },
+            // History A (73-89)
+            { id: 73, c: 'colonial', q: "Colonists came to America for many reasons. Name one.", a: ["Freedom", "Liberty", "Opportunity", "Escape persecution"], info: "Migration." },
+            { id: 74, c: 'colonial', q: "Who lived in America before Europeans arrived?", a: ["American Indians", "Native Americans"], info: "First peoples.", is6520: true },
+            { id: 75, c: 'colonial', q: "What group was taken and sold as slaves?", a: ["Africans", "People from Africa"], info: "Slavery." },
+            { id: 76, c: 'colonial', q: "War fought to win independence from Britain?", a: ["American Revolution"], info: "1776 War." },
+            { id: 77, c: 'colonial', q: "Reason for independence?", a: ["High taxes", "No representation", "Quartering"], info: "Grievances." },
+            { id: 78, c: 'colonial', q: "Who wrote the Declaration of Independence?", a: ["Thomas Jefferson"], info: "Author.", is6520: true },
+            { id: 79, c: 'colonial', q: "When was the Declaration adopted?", a: ["July 4 1776"], info: "Date.", is6520: true },
+            { id: 80, c: 'colonial', q: "Important event of American Revolution?", a: ["Bunker Hill", "Declaration of Independence", "Saratoga", "Yorktown"], info: "Event." },
+            { id: 81, c: 'colonial', q: "Name five original states.", a: ["NY", "NJ", "PA", "MA", "VA", "GA", "NC", "SC", "NH", "CT", "RI", "MD", "DE"], info: "Original 13." },
+            { id: 82, c: 'colonial', q: "What founding document was written in 1787?", a: ["Constitution"], info: "Drafting." },
+            { id: 83, c: 'colonial', q: "Writer of Federalist Papers?", a: ["Madison", "Hamilton", "Jay", "Publius"], info: "Support." },
+            { id: 84, c: 'colonial', q: "Why were Federalist Papers important?", a: ["Supported Constitution", "Explained Constitution"], info: "Ratification." },
+            { id: 85, c: 'colonial', q: "Benjamin Franklin is famous for?", a: ["Diplomat", "Inventor", "Postmaster", "Libraries"], info: "Legacy." },
+            { id: 86, c: 'colonial', q: "George Washington is famous for?", a: ["Father of Country", "First President", "General"], info: "First.", is6520: true },
+            { id: 87, c: 'colonial', q: "Thomas Jefferson is famous for?", a: ["Declaration of Independence", "Third President", "Louisiana Purchase"], info: "Third." },
+            { id: 88, c: 'colonial', q: "James Madison is famous for?", a: ["Father of Constitution", "Fourth President"], info: "Fourth." },
+            { id: 89, c: 'colonial', q: "Alexander Hamilton is famous for?", a: ["First Treasury Secretary", "Federalist Papers", "Bank"], info: "Treasury." },
 
-            // History B: 1800s
-            { id: 90, c: '1800s', q: "What territory did the United States buy from France in 1803?", a: ["Louisiana Territory", "Louisiana"], info: "Expansion." },
-            { id: 91, c: '1800s', q: "Name one war fought by the United States in the 1800s.", a: ["War of 1812", "Mexican-American War", "Civil War", "Spanish-American War"], info: "19th century conflicts." },
-            { id: 92, c: '1800s', q: "Name the U.S. war between the North and the South.", a: ["The Civil War"], info: "Internal conflict." },
-            { id: 93, c: '1800s', q: "The Civil War had many important events. Name one.", a: ["Fort Sumter", "Emancipation Proclamation", "Vicksburg", "Gettysburg", "Sherman's March", "Appomattox", "Antietam", "Lincoln assassinated"], info: "Key events." },
-            { id: 94, c: '1800s', q: "Abraham Lincoln is famous for many things. Name one.", a: ["Freed the slaves", "Emancipation Proclamation", "Saved the Union", "Led US during Civil War", "16th president"], info: "Great Emancipator.", is6520: true },
-            { id: 95, c: '1800s', q: "What did the Emancipation Proclamation do?", a: ["Freed the slaves", "Freed slaves in the Confederacy"], info: "Executive order." },
-            { id: 96, c: '1800s', q: "What U.S. war ended slavery?", a: ["The Civil War"], info: "Result of the war." },
-            { id: 97, c: '1800s', q: "What amendment says all persons born or naturalized in the United States are U.S. citizens?", a: ["14th Amendment"], info: "Birthright citizenship." },
-            { id: 98, c: '1800s', q: "When did all men get the right to vote?", a: ["After the Civil War", "During Reconstruction", "15th Amendment", "1870"], info: "Suffrage expansion." },
-            { id: 99, c: '1800s', q: "Name one leader of the women's rights movement in the 1800s.", a: ["Susan B. Anthony", "Elizabeth Cady Stanton", "Sojourner Truth", "Harriet Tubman", "Lucretia Mott", "Lucy Stone"], info: "Suffragettes." },
+            // History B (90-99)
+            { id: 90, c: '1800s', q: "Territory bought from France in 1803?", a: ["Louisiana"], info: "Purchase." },
+            { id: 91, c: '1800s', q: "War fought in 1800s?", a: ["1812", "Mexican-American", "Civil War", "Spanish-American"], info: "19th Century." },
+            { id: 92, c: '1800s', q: "War between North and South?", a: ["Civil War"], info: "Internal." },
+            { id: 93, c: '1800s', q: "Civil War event?", a: ["Gettysburg", "Emancipation", "Lincoln death", "Appomattox"], info: "Event." },
+            { id: 94, c: '1800s', q: "Abraham Lincoln is famous for?", a: ["Freed slaves", "Saved Union", "Civil War", "16th President"], info: "Legacy.", is6520: true },
+            { id: 95, c: '1800s', q: "What did Emancipation Proclamation do?", a: ["Freed slaves"], info: "Order." },
+            { id: 96, c: '1800s', q: "What war ended slavery?", a: ["Civil War"], info: "Result." },
+            { id: 97, c: '1800s', q: "Amendment for birthright citizenship?", a: ["14th"], info: "Citizenship." },
+            { id: 98, c: '1800s', q: "When did all men get vote?", a: ["After Civil War", "15th Amendment", "1870"], info: "Vote." },
+            { id: 99, c: '1800s', q: "Leader of women's rights in 1800s?", a: ["Susan B Anthony", "Stanton", "Sojourner Truth"], info: "Suffrage." },
 
-            // History C: Recent American History
-            { id: 100, c: 'recent', q: "Name one war fought by the United States in the 1900s.", a: ["World War I", "World War II", "Korean War", "Vietnam War", "Gulf War"], info: "20th century conflicts." },
-            { id: 101, c: 'recent', q: "Why did the United States enter World War I?", a: ["Germany attacked U.S. ships", "Support Allied Powers", "Oppose Central Powers"], info: "1917 entry." },
-            { id: 102, c: 'recent', q: "When did all women get the right to vote?", a: ["1920", "After World War I", "19th Amendment"], info: "Women's suffrage." },
-            { id: 103, c: 'recent', q: "What was the Great Depression?", a: ["Longest economic recession in modern history"], info: "Economic crisis." },
-            { id: 104, c: 'recent', q: "When did the Great Depression start?", a: ["The Great Crash", "1929", "Stock market crash of 1929"], info: "Start date." },
-            { id: 105, c: 'recent', q: "Who was president during the Great Depression and World War II?", a: ["Franklin Roosevelt", "Roosevelt"], info: "FDR." },
-            { id: 106, c: 'recent', q: "Why did the United States enter World War II?", a: ["Bombing of Pearl Harbor", "Japanese attacked Pearl Harbor", "Support Allied Powers", "Oppose Axis Powers"], info: "Dec 7, 1941." },
-            { id: 107, c: 'recent', q: "Dwight Eisenhower is famous for many things. Name one.", a: ["General during World War II", "President during Korean War", "34th president", "Interstate System"], info: "Ike." },
-            { id: 108, c: 'recent', q: "Who was the United States' main rival during the Cold War?", a: ["Soviet Union", "USSR", "Russia"], info: "Superpower rivalry." },
-            { id: 109, c: 'recent', q: "During the Cold War, what was one main concern of the United States?", a: ["Communism", "Nuclear war"], info: "Ideological conflict." },
-            { id: 110, c: 'recent', q: "Why did the United States enter the Korean War?", a: ["To stop the spread of communism"], info: "Containment." },
-            { id: 111, c: 'recent', q: "Why did the United States enter the Vietnam War?", a: ["To stop the spread of communism"], info: "Containment policy." },
-            { id: 112, c: 'recent', q: "What did the civil rights movement do?", a: ["Fought to end racial discrimination"], info: "Social justice." },
-            { id: 113, c: 'recent', q: "Martin Luther King, Jr. is famous for many things. Name one.", a: ["Fought for civil rights", "Worked for equality", "I Have a Dream"], info: "Civil rights leader." },
-            { id: 114, c: 'recent', q: "Why did the United States enter the Persian Gulf War?", a: ["To force the Iraqi military from Kuwait"], info: "Operation Desert Storm." },
-            { id: 115, c: 'recent', q: "What major event happened on September 11, 2001 in the United States?", a: ["Terrorists attacked the United States"], info: "9/11.", is6520: true },
-            { id: 116, c: 'recent', q: "Name one U.S. military conflict after the September 11, 2001 attacks.", a: ["War on Terror", "War in Afghanistan", "War in Iraq"], info: "Post-9/11." },
-            { id: 117, c: 'recent', q: "Name one American Indian tribe in the United States.", a: ["Apache", "Blackfeet", "Cayuga", "Cherokee", "Cheyenne", "Chippewa", "Choctaw", "Creek", "Crow", "Hopi", "Huron", "Inupiat", "Lakota", "Mohawk", "Mohegan", "Navajo", "Oneida", "Onondaga", "Pueblo", "Seminole", "Seneca", "Shawnee", "Sioux", "Teton", "Tuscarora"], info: "Federally recognized." },
-            { id: 118, c: 'recent', q: "Name one example of an American innovation.", a: ["Light bulb", "Automobile", "Skyscrapers", "Airplane", "Assembly line", "Landing on the moon", "Integrated circuit"], info: "Technological progress." },
+            // History C (100-118)
+            { id: 100, c: 'recent', q: "War fought in 1900s?", a: ["WWI", "WWII", "Korean", "Vietnam", "Gulf"], info: "20th Century." },
+            { id: 101, c: 'recent', q: "Why did US enter WWI?", a: ["Germany attacked ships", "Allied Powers"], info: "Reason." },
+            { id: 102, c: 'recent', q: "When did women get vote?", a: ["1920", "19th Amendment"], info: "Women vote." },
+            { id: 103, c: 'recent', q: "What was Great Depression?", a: ["Longest recession", "Economic crisis"], info: "Economy." },
+            { id: 104, c: 'recent', q: "When did Great Depression start?", a: ["1929", "Crash"], info: "Date." },
+            { id: 105, c: 'recent', q: "President during Depression and WWII?", a: ["Franklin Roosevelt", "FDR"], info: "President." },
+            { id: 106, c: 'recent', q: "Why enter WWII?", a: ["Pearl Harbor", "Japan attack"], info: "Reason." },
+            { id: 107, c: 'recent', q: "Dwight Eisenhower famous for?", a: ["General WWII", "President", "Highways"], info: "General." },
+            { id: 108, c: 'recent', q: "Cold War rival?", a: ["Soviet Union", "USSR", "Russia"], info: "Rival." },
+            { id: 109, c: 'recent', q: "Cold War concern?", a: ["Communism", "Nuclear war"], info: "Fear." },
+            { id: 110, c: 'recent', q: "Why enter Korean War?", a: ["Stop communism"], info: "Korea." },
+            { id: 111, c: 'recent', q: "Why enter Vietnam War?", a: ["Stop communism"], info: "Vietnam." },
+            { id: 112, c: 'recent', q: "What did civil rights movement do?", a: ["Ended discrimination"], info: "Equality." },
+            { id: 113, c: 'recent', q: "Martin Luther King Jr famous for?", a: ["Civil rights", "Equality"], info: "Leader." },
+            { id: 114, c: 'recent', q: "Why enter Gulf War?", a: ["Free Kuwait", "Force Iraq out"], info: "Kuwait." },
+            { id: 115, c: 'recent', q: "Event on Sept 11, 2001?", a: ["Terrorist attack"], info: "9/11.", is6520: true },
+            { id: 116, c: 'recent', q: "Conflict after 9/11?", a: ["War on Terror", "Afghanistan", "Iraq"], info: "War." },
+            { id: 117, c: 'recent', q: "American Indian tribe?", a: ["Cherokee", "Navajo", "Sioux", "Apache", "Iroquois"], info: "Tribe." },
+            { id: 118, c: 'recent', q: "American innovation?", a: ["Light bulb", "Car", "Airplane", "Moon landing", "Internet"], info: "Tech." },
 
-            // Symbols
-            { id: 119, c: 'symbols', q: "What is the capital of the United States?", a: ["Washington, D.C."], info: "Federal capital." },
-            { id: 120, c: 'symbols', q: "Where is the Statue of Liberty?", a: ["New York Harbor", "Liberty Island", "New Jersey", "Hudson River"], info: "Icon of freedom." },
-            { id: 121, c: 'symbols', q: "Why does the flag have 13 stripes?", a: ["13 original colonies", "Represent the original colonies"], info: "Original states.", is6520: true },
-            { id: 122, c: 'symbols', q: "Why does the flag have 50 stars?", a: ["One star for each state", "Each star represents a state", "50 states"], info: "Current union." },
-            { id: 123, c: 'symbols', q: "What is the name of the national anthem?", a: ["The Star-Spangled Banner"], info: "By Francis Scott Key." },
-            { id: 124, c: 'symbols', q: "The Nation's first motto was \"E Pluribus Unum.\" What does that mean?", a: ["Out of many, one", "We all become one"], info: "Unity." },
-
-            // Holidays
-            { id: 125, c: 'holidays', q: "What is Independence Day?", a: ["A holiday to celebrate U.S. independence", "The country's birthday"], info: "July 4th." },
-            { id: 126, c: 'holidays', q: "Name three national U.S. holidays.", a: ["New Year's Day", "Martin Luther King, Jr. Day", "Presidents Day", "Memorial Day", "Juneteenth", "Independence Day", "Labor Day", "Columbus Day", "Veterans Day", "Thanksgiving Day", "Christmas Day"], info: "Pick 3." },
-            { id: 127, c: 'holidays', q: "What is Memorial Day?", a: ["A holiday to honor soldiers who died in military service"], info: "Honoring the fallen." },
-            { id: 128, c: 'holidays', q: "What is Veterans Day?", a: ["A holiday to honor people in the U.S. military", "Holiday to honor people who have served"], info: "Honoring service." }
+            // Symbols & Holidays (119-128)
+            { id: 119, c: 'symbols', q: "Capital of US?", a: ["Washington DC"], info: "Capital." },
+            { id: 120, c: 'symbols', q: "Where is Statue of Liberty?", a: ["New York", "Liberty Island"], info: "Statue." },
+            { id: 121, c: 'symbols', q: "Why 13 stripes?", a: ["13 colonies"], info: "Colonies.", is6520: true },
+            { id: 122, c: 'symbols', q: "Why 50 stars?", a: ["50 states"], info: "States." },
+            { id: 123, c: 'symbols', q: "Name of national anthem?", a: ["Star Spangled Banner"], info: "Anthem." },
+            { id: 124, c: 'symbols', q: "First motto E Pluribus Unum means?", a: ["Out of many one"], info: "Motto." },
+            { id: 125, c: 'holidays', q: "What is Independence Day?", a: ["Birthday of US", "Celebrate independence"], info: "July 4." },
+            { id: 126, c: 'holidays', q: "Three national holidays?", a: ["New Year", "Christmas", "Thanksgiving", "Independence", "Labor", "Memorial", "Veterans", "Presidents", "MLK", "Juneteenth"], info: "Holidays." },
+            { id: 127, c: 'holidays', q: "What is Memorial Day?", a: ["Honor soldiers who died"], info: "Died in service." },
+            { id: 128, c: 'holidays', q: "What is Veterans Day?", a: ["Honor all who served", "Honor military"], info: "Service." }
         ];
     };
 
@@ -639,32 +733,96 @@
     const $ = (id) => document.getElementById(id);
 
     const levenshtein = (a, b) => {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+
         const matrix = [];
         for(let i=0; i<=b.length; i++) matrix[i] = [i];
         for(let j=0; j<=a.length; j++) matrix[0][j] = j;
+
         for(let i=1; i<=b.length; i++){
             for(let j=1; j<=a.length; j++){
-                if(b.charAt(i-1) == a.charAt(j-1)) matrix[i][j] = matrix[i-1][j-1];
-                else matrix[i][j] = Math.min(matrix[i-1][j-1]+1, matrix[i][j-1]+1, matrix[i-1][j]+1);
+                if(b.charAt(i-1) === a.charAt(j-1)) {
+                    matrix[i][j] = matrix[i-1][j-1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i-1][j-1] + 1, // substitution
+                        matrix[i][j-1] + 1,   // insertion
+                        matrix[i-1][j] + 1    // deletion
+                    );
+                }
             }
         }
         return matrix[b.length][a.length];
     };
 
+    // --- ALGORITHM: Professional Typo Removal & Normalization ---
+    const normalizeText = (text) => {
+        if (!text) return "";
+
+        // 1. Basic Cleaning
+        let norm = text.toLowerCase()
+            .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "") // Remove punctuation
+            .replace(/\s{2,}/g, " ") // Remove extra spaces
+            .trim();
+
+        // 2. Stop Words Removal (Optional, but helps with "The Constitution" vs "Constitution")
+        // Removing 'the', 'a', 'an' only if they are at start or strict match context might be safer,
+        // but for civics, stripping them generally helps.
+        const stopWords = ["the", "a", "an"];
+        const words = norm.split(" ").filter(w => !stopWords.includes(w));
+        norm = words.join(" ");
+
+        // 3. Synonym Replacement (Multi-pass)
+        // We must check longest phrases first to avoid partial replacement issues
+        // e.g. avoid replacing "war" in "civil war" if "war" was a key.
+        // Keys are sorted by length desc in logic below.
+
+        const sortedKeys = Object.keys(SYNONYM_DICT).sort((a, b) => b.length - a.length);
+
+        for (const key of sortedKeys) {
+            // strict word boundary check to avoid replacing parts of words
+            const regex = new RegExp(`\\b${key}\\b`, "g");
+            if (regex.test(norm)) {
+                norm = norm.replace(regex, SYNONYM_DICT[key]);
+            }
+        }
+
+        return norm;
+    };
+
     const isCorrect = (input, answers) => {
-        if(!input) return false;
-        const cleanInput = input.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
+        if (!input) return false;
+
+        // Allow wildcard
         if (answers.includes("*")) return true;
 
+        const userNorm = normalizeText(input);
+
         return answers.some(ans => {
-            const cleanAns = ans.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
-            if (cleanInput.includes(cleanAns)) return true;
-            const dist = levenshtein(cleanInput, cleanAns);
-            const threshold = Math.floor(cleanAns.length / 4) || 1;
-            if (dist <= threshold) return true;
-            const numMap = {"one":"1", "two":"2", "twenty-seven":"27", "fifty":"50"};
-            if (numMap[cleanAns] === cleanInput) return true;
-            return false;
+            // 1. Normalize the official answer too
+            const ansNorm = normalizeText(ans);
+
+            // 2. Check Strict Inclusion (e.g. "Washington" inside "George Washington")
+            // We check both ways: Does user input contain required keyword? Or does answer contain user input?
+            if (userNorm.includes(ansNorm) || ansNorm.includes(userNorm)) {
+                // Filter out short accidental matches (e.g. "no" inside "north")
+                // If matched string is very short (<3 chars) require exact match
+                if (Math.min(userNorm.length, ansNorm.length) < 3) {
+                    return userNorm === ansNorm;
+                }
+                return true;
+            }
+
+            // 3. Levenshtein Fuzzy Match (Typo Tolerance)
+            const dist = levenshtein(userNorm, ansNorm);
+
+            // Dynamic threshold: Allow 1 typo per 4-5 characters
+            // e.g. "Washinton" (9 chars) -> dist 1 -> Allowed
+            // "Wash" (4 chars) -> dist 0 -> Strict
+            const threshold = Math.floor(ansNorm.length / 4);
+
+            return dist <= threshold;
         });
     };
 
@@ -680,7 +838,7 @@
             select.appendChild(opt);
         });
 
-        // Init Categories with New Design
+        // Init Categories
         const catContainer = $('categories-container');
         CATEGORIES.forEach(cat => {
             const btn = document.createElement('button');
@@ -789,7 +947,6 @@
         $('total-q-num').innerText = APP_STATE.questions.length;
         $('progress-bar').style.width = `${((APP_STATE.currentIndex) / APP_STATE.questions.length) * 100}%`;
 
-        // Text animation refresh
         const qt = $('question-text');
         qt.style.opacity = 0;
         qt.style.transform = "translateY(10px)";
@@ -920,7 +1077,6 @@
         const percent = Math.round((APP_STATE.stats.correct / APP_STATE.stats.total) * 100) || 0;
         $('final-percent').innerText = `${percent}%`;
 
-        // Animated subtitle
         const msg = percent >= 60 ? "Great job! You're ready." : "Keep practicing!";
         $('end-title').innerText = msg;
         $('end-subtitle').innerText = `You got ${APP_STATE.stats.correct} out of ${APP_STATE.stats.total} correct.`;
